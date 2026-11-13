@@ -1,0 +1,2111 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petualangan Dev Gim - Studio Kota Gim</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --studio-bg: #0f172a;
+            --studio-surface: rgba(255, 255, 255, 0.96);
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at 15% 15%, #1e293b 0%, #0f172a 55%, #020617 100%);
+            min-height: 100vh;
+            user-select: none;
+            overflow-x: hidden;
+            position: relative;
+        }
+        .font-mono-code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Subtle Architectural Blueprint Grid Background */
+        .studio-blueprint-bg {
+            background-image: 
+                linear-gradient(to right, rgba(56, 189, 248, 0.06) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(56, 189, 248, 0.06) 1px, transparent 1px);
+            background-size: 36px 36px;
+        }
+
+        @keyframes floatSubtle {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45); }
+            50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+        }
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-4deg); }
+            75% { transform: rotate(4deg); }
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.95) translateY(10px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .animate-float { animation: floatSubtle 3.6s ease-in-out infinite; }
+        .animate-wiggle { animation: wiggle 0.4s ease-in-out; }
+        .animate-pop-in { animation: popIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .animate-glow { animation: pulseGlow 2.4s infinite; }
+
+        /* Tactile Realistic Depth Buttons & Cards */
+        .btn-chunky {
+            box-shadow: 0 4px 0 rgba(15, 23, 42, 0.35), 0 8px 18px rgba(2, 6, 23, 0.25);
+            transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.15s ease;
+        }
+        .btn-chunky:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+        .btn-chunky:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 rgba(15, 23, 42, 0.4), 0 2px 6px rgba(2, 6, 23, 0.2);
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(16px);
+            box-shadow: 0 24px 50px -12px rgba(2, 6, 23, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.15);
+        }
+
+        .station-card {
+            box-shadow: 0 10px 25px -5px rgba(2, 6, 23, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+            transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .station-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 32px -6px rgba(2, 6, 23, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        }
+        .station-card:active {
+            transform: translateY(2px);
+        }
+
+        .confetti-piece {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            top: -15px;
+            z-index: 9999;
+            animation: fallConfetti 2.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        @keyframes fallConfetti {
+            to {
+                transform: translateY(106vh) rotate(760deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body class="studio-blueprint-bg text-slate-800 flex flex-col items-center justify-between">
+
+    <!-- AMBIENT STUDIO LIGHTING GLOW -->
+    <div class="fixed top-0 left-1/4 w-96 h-96 bg-sky-500/15 rounded-full blur-3xl pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none z-0"></div>
+
+    <div id="confetti-container"></div>
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="relative z-10 w-full max-w-5xl px-4 pt-4 pb-2 flex items-center justify-between gap-2">
+        <button onclick="game.showMap()" class="flex items-center gap-3 bg-slate-900/90 hover:bg-slate-800 text-white backdrop-blur px-4 py-2.5 rounded-2xl shadow-lg border border-slate-700/80 transition group">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-lg shadow-inner group-hover:scale-105 transition-transform">
+                🎮
+            </div>
+            <div class="text-left">
+                <h1 class="font-extrabold text-white text-sm md:text-base leading-none tracking-tight">Studio Kota Gim</h1>
+                <span class="font-mono-code text-[10px] font-semibold text-sky-400 uppercase tracking-widest">AAA Game Dev Lab</span>
+            </div>
+        </button>
+
+        <div class="flex items-center gap-2.5">
+            <!-- Overall Progress Pill -->
+            <div class="bg-slate-900/90 border border-amber-500/40 px-3.5 py-1.5 rounded-2xl flex items-center gap-2.5 shadow-lg">
+                <span class="text-lg">⭐</span>
+                <div class="flex flex-col leading-none">
+                    <span class="font-mono-code text-[9px] font-bold text-amber-400 uppercase">Milestone</span>
+                    <span id="total-stars" class="font-extrabold text-white text-xs md:text-sm">0 / 21</span>
+                </div>
+            </div>
+
+            <button onclick="game.toggleMute()" id="btn-mute" class="bg-slate-900/90 hover:bg-slate-800 text-white w-11 h-11 rounded-2xl shadow-lg border border-slate-700/80 flex items-center justify-center text-lg transition active:translate-y-0.5" title="Suara">
+                🔊
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="relative z-10 w-full max-w-4xl flex-1 flex flex-col items-center justify-center px-4 py-2">
+
+        <!-- SCREEN 1: WELCOME SPLASH -->
+        <div id="screen-welcome" class="w-full glass-panel rounded-3xl p-6 md:p-10 border border-slate-200 text-center flex flex-col items-center animate-pop-in relative overflow-hidden">
+            <div class="relative mb-5">
+                <div class="w-24 h-24 md:w-28 md:h-28 rounded-3xl bg-gradient-to-br from-slate-800 via-slate-900 to-indigo-950 flex items-center justify-center text-5xl md:text-6xl shadow-2xl border-2 border-sky-400/50 animate-float">
+                    🖥️
+                </div>
+                <span class="absolute -bottom-2 -right-2 bg-emerald-500 text-white text-xs font-extrabold px-2.5 py-1 rounded-lg shadow-md border border-white">v2.0</span>
+            </div>
+
+            <span class="font-mono-code bg-slate-900 text-sky-400 font-bold text-xs px-4 py-1.5 rounded-full uppercase tracking-wider mb-3 shadow-sm">
+                Simulasi Produksi & Pengembangan Gim
+            </span>
+
+            <h2 class="text-3xl md:text-5xl font-extrabold text-slate-900 mb-3 tracking-tight">
+                Petualangan Dev Gim
+            </h2>
+
+            <p class="text-slate-600 font-medium text-sm md:text-base max-w-lg mb-7 leading-relaxed">
+                Masuki lingkungan kerja studio profesional! Kuasai <strong class="text-slate-900">7 Departemen Pengembangan Gim</strong> melalui <strong class="text-sky-700">5 simulasi interaktif</strong> mulai dari eksplorasi studio, wawancara mentor, hingga penyusunan arsitektur gim.
+            </p>
+
+            <!-- Feature Pills -->
+            <div class="grid grid-cols-3 gap-3 w-full max-w-lg mb-7 text-xs font-bold">
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 flex flex-col items-center gap-1.5 shadow-sm">
+                    <span class="text-xl">🧑‍💻</span>
+                    <span class="text-slate-800">Eksplorasi Studio</span>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 flex flex-col items-center gap-1.5 shadow-sm">
+                    <span class="text-xl">🧩</span>
+                    <span class="text-slate-800">Drag & Drop Kode</span>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 flex flex-col items-center gap-1.5 shadow-sm">
+                    <span class="text-xl">📊</span>
+                    <span class="text-slate-800">Audit & Arsitektur</span>
+                </div>
+            </div>
+
+            <button onclick="game.startAdventure()" class="btn-chunky animate-glow bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-extrabold text-base md:text-lg px-9 py-4 rounded-2xl flex items-center gap-3">
+                <span>Mulai Shift Produksi</span>
+                <span class="text-xl">➡️</span>
+            </button>
+        </div>
+
+        <!-- SCREEN 2: WORLD MAP HUB -->
+        <div id="screen-map" class="hidden w-full flex flex-col items-center animate-pop-in">
+            <div class="bg-slate-900/90 backdrop-blur-md px-6 py-3.5 rounded-2xl border border-slate-700/80 mb-5 flex flex-col sm:flex-row items-center justify-between gap-3 w-full shadow-xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-xl">🏢</div>
+                    <div class="text-left">
+                        <h2 class="font-extrabold text-white text-base md:text-lg leading-tight">Divisi Produksi Studio Gim</h2>
+                        <p class="text-xs font-medium text-slate-400">Pilih divisi untuk menyelesaikan 5 tahap simulasi pengembangan</p>
+                    </div>
+                </div>
+                <div id="map-completion-badge" class="font-mono-code bg-sky-500/20 text-sky-300 font-bold text-xs px-3.5 py-1.5 rounded-xl border border-sky-400/30">
+                    0 / 7 Divisi Selesai
+                </div>
+            </div>
+
+            <div id="map-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full pb-4">
+                <!-- Station cards injected dynamically -->
+            </div>
+        </div>
+
+        <!-- SCREEN 3: MINI-GAME ARENA -->
+        <div id="screen-game" class="hidden w-full glass-panel rounded-3xl p-4 md:p-6 border border-slate-200 flex flex-col items-center">
+            <!-- Arena Top Bar -->
+            <div class="w-full flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-200">
+                <button onclick="game.showMap()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3.5 py-2 rounded-xl text-xs md:text-sm flex items-center gap-1.5 border border-slate-300 transition">
+                    <span>⬅️</span>
+                    <span>Lobi Studio</span>
+                </button>
+
+                <div class="flex items-center gap-2.5 bg-slate-900 text-white px-4 py-1.5 rounded-2xl shadow-sm">
+                    <span id="station-badge-emoji" class="text-xl">💡</span>
+                    <div class="text-left">
+                        <h3 id="station-badge-title" class="font-extrabold text-white text-sm md:text-base leading-tight">Konsep Gim</h3>
+                        <p id="station-badge-sub" class="font-mono-code text-[10px] font-semibold text-sky-400 uppercase tracking-wider">Game Concept</p>
+                    </div>
+                </div>
+
+                <!-- 5-Step Visual Progress Dots -->
+                <div class="flex flex-col items-end gap-1">
+                    <div id="stage-dots" class="flex items-center gap-1.5">
+                        <!-- 5 dots rendered dynamically -->
+                    </div>
+                    <span id="stage-badge" class="font-mono-code text-[11px] font-bold text-slate-600">
+                        Tahap 1/5: Studio Platformer
+                    </span>
+                </div>
+            </div>
+
+            <!-- Audio Instruction Banner -->
+            <button id="btn-speaker-prompt" onclick="game.replayInstruction()" class="mb-4 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white font-semibold px-5 py-2 rounded-full shadow-md flex items-center gap-2.5 text-xs md:text-sm transition border border-slate-600">
+                <span class="text-base">🔊</span>
+                <span id="prompt-text-spoken">Dengarkan Briefing Tugas</span>
+            </button>
+
+            <!-- GAME STAGE CONTENT AREA -->
+            <div id="game-stage-container" class="w-full flex flex-col items-center min-h-[295px] justify-center">
+                <!-- Dynamic Content loaded here (Stages 1 to 5) -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- CELEBRATION MODAL -->
+    <div id="modal-win" class="hidden fixed inset-0 bg-slate-950/75 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full text-center border border-slate-200 shadow-2xl animate-pop-in relative overflow-hidden">
+            <div class="w-20 h-20 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-4xl shadow-lg text-white">
+                🏆
+            </div>
+            <div class="flex justify-center gap-1.5 text-2xl mb-3">
+                <span>⭐</span><span>⭐</span><span>⭐</span>
+            </div>
+            <h3 id="win-title" class="text-2xl font-extrabold text-slate-900 mb-1">Divisi Selesai!</h3>
+            <p id="win-subtitle" class="font-medium text-slate-600 text-sm md:text-base mb-6">Seluruh 5 simulasi produksi pada divisi ini berhasil diselesaikan.</p>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <button onclick="game.showMap(); document.getElementById('modal-win').classList.add('hidden');" class="btn-chunky bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold px-5 py-3 rounded-xl">
+                    🏢 Ke Lobi Studio
+                </button>
+                <button onclick="game.nextStation()" class="btn-chunky bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold px-6 py-3 rounded-xl">
+                    Divisi Berikutnya ➡️
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="relative z-10 w-full text-center py-2.5 text-xs font-medium text-slate-400">
+        Studio Kota Gim • Simulasi Kurikulum Pengembangan Gim Interaktif
+    </footer>
+
+    <script>
+        // =========================================================================
+        // 1. WEB AUDIO SYNTHESIZER (EFEK SUARA TANPA FILE EKSTERNAL)
+        // =========================================================================
+        class SoundEffects {
+            constructor() {
+                this.ctx = null;
+                this.muted = false;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) this.ctx = new AudioCtx();
+                }
+            }
+
+            playTone(freq, type, duration, vol = 0.15) {
+                if (this.muted) return;
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch (e) {}
+            }
+
+            playPop() {
+                this.playTone(540, 'sine', 0.11, 0.16);
+            }
+
+            playJump() {
+                this.playTone(340, 'sine', 0.14, 0.14);
+                setTimeout(() => this.playTone(520, 'sine', 0.12, 0.12), 55);
+            }
+
+            playCoin() {
+                this.playTone(880, 'sine', 0.09, 0.15);
+                setTimeout(() => this.playTone(1174.66, 'sine', 0.16, 0.15), 70);
+            }
+
+            playSuccess() {
+                this.playTone(523.25, 'triangle', 0.15, 0.2);
+                setTimeout(() => this.playTone(659.25, 'triangle', 0.15, 0.2), 110);
+                setTimeout(() => this.playTone(783.99, 'triangle', 0.28, 0.22), 220);
+            }
+
+            playWrong() {
+                this.playTone(220, 'sawtooth', 0.18, 0.12);
+                setTimeout(() => this.playTone(175, 'sawtooth', 0.24, 0.12), 140);
+            }
+        }
+
+        // =========================================================================
+        // 2. SPEECH SYNTHESIS (SULIH SUARA BAHASA INDONESIA)
+        // =========================================================================
+        class SpeechHelper {
+            constructor() {
+                this.muted = false;
+            }
+
+            speak(text) {
+                if (this.muted || !('speechSynthesis' in window)) return;
+                try {
+                    window.speechSynthesis.cancel();
+                    const utter = new SpeechSynthesisUtterance(text);
+                    utter.lang = 'id-ID';
+                    utter.rate = 1.03;
+                    utter.pitch = 1.08;
+                    window.speechSynthesis.speak(utter);
+                } catch (e) {}
+            }
+        }
+
+        // =========================================================================
+        // 3. MAIN APPLICATION CONTROLLER
+        // =========================================================================
+        class DevGameApp {
+            constructor() {
+                this.sound = new SoundEffects();
+                this.speech = new SpeechHelper();
+
+                this.platformerAnimId = null;
+                this.keyDownHandler = null;
+                this.keyUpHandler = null;
+                this.catcherAnimId = null;
+                this.catcherSpawnTimer = null;
+
+                // 7 Departemen Materi Pengembangan Gim (masing-masing 5 Mini-Game)
+                this.stations = [
+                    { 
+                        id: 'dev-konsep', 
+                        letter: '01', 
+                        building: 'R&D Concept Lab',
+                        name: 'Konsep Gim', 
+                        enName: 'Game Concept',
+                        npcName: 'Raka • Lead Game Producer',
+                        npcHint: 'Sebelum tim menulis satu baris kode pun, kita wajib menyusun Konsep Gim: dokumen ringkas berisi ide utama, genre permainan, target pemain, dan nilai jual uniknya.',
+                        question: 'Dokumen ringkas berisi ide utama, genre, target pemain, dan keunikan gim disebut...',
+                        options: ['Konsep Gim', 'Sistem Gim', 'Pustaka'],
+                        wordQuestion: 'Kategori gaya atau jenis utama sebuah permainan (seperti Action, RPG, atau Puzzle) disebut...',
+                        word: 'GENRE', 
+                        emoji: '💡',
+                        color: 'from-amber-600 via-orange-600 to-amber-700',
+                        tfStatement: 'Konsep Gim (Game Concept) berisi ide inti, genre, dan target audiens sebelum memasuki tahap produksi penuh.',
+                        tfAnswer: true,
+                        catchTargets: ['💡 Ide Inti', '🎯 Genre', '👥 Audiens'],
+                        catchAvoid: ['🐛 Bug', '💥 Crash'],
+                        pairs: [
+                            { left: 'Genre Gim', right: 'Kategori gaya permainan (Action, RPG)' },
+                            { left: 'Target Audiens', right: 'Kelompok usia pemain yang dituju' },
+                            { left: 'Core Loop', right: 'Aktivitas utama yang diulang pemain' }
+                        ]
+                    },
+                    { 
+                        id: 'dev-desain', 
+                        letter: '02', 
+                        building: 'Blueprint Studio',
+                        name: 'Desain Gim', 
+                        enName: 'Game Design Document',
+                        npcName: 'Sari • Principal Game Designer',
+                        npcHint: 'Untuk menyatukan visi programmer dan artist, kita memakai Desain Gim (GDD) sebagai cetak biru lengkap berisi aturan main dan spesifikasi mekanik detail.',
+                        question: 'Cetak biru (blueprint) lengkap berisi aturan, mekanik, dan rancangan detail gim disebut...',
+                        options: ['Desain Gim', 'Narasi Gim', 'Level Gim'],
+                        wordQuestion: 'Aturan aksi dasar yang dapat dilakukan pemain (seperti melompat, berlari, atau menyerang) disebut...',
+                        word: 'MEKANIK', 
+                        emoji: '📐',
+                        color: 'from-emerald-600 via-teal-700 to-emerald-800',
+                        tfStatement: 'Game Design Document (GDD) berfungsi sebagai panduan kerja bagi programmer, artist, dan desainer suara.',
+                        tfAnswer: true,
+                        catchTargets: ['📐 Blueprint', '📜 Aturan', '🕹️ Mekanik'],
+                        catchAvoid: ['🦠 Virus', '⚠️ Error'],
+                        pairs: [
+                            { left: 'GDD', right: 'Dokumen cetak biru desain gim' },
+                            { left: 'UI / UX', right: 'Antarmuka tombol & kenyamanan pemain' },
+                            { left: 'Mekanik', right: 'Aturan aksi seperti lompat & serang' }
+                        ]
+                    },
+                    { 
+                        id: 'dev-sistem', 
+                        letter: '03', 
+                        building: 'Systems & Economy Room',
+                        name: 'Sistem Gim', 
+                        enName: 'Game System Concept',
+                        npcName: 'Budi • Senior System Designer',
+                        npcHint: 'Keseimbangan permainan ditentukan di sini! Perhitungan skor, nyawa (HP), damage, dan aturan ekonomi koin diatur di dalam Sistem Gim.',
+                        question: 'Aturan matematika, skor, nyawa, dan ekonomi yang saling berinteraksi dalam gim disebut...',
+                        options: ['Sistem Gim', 'Teknik Gim', 'Narasi Gim'],
+                        wordQuestion: 'Aturan perhitungan nilai, nyawa (HP), dan penyeimbang kesulitan dalam permainan disebut...',
+                        word: 'SISTEM', 
+                        emoji: '⚙️',
+                        color: 'from-sky-600 via-blue-700 to-indigo-800',
+                        tfStatement: 'Sistem Gim mengatur keseimbangan permainan (game balancing) seperti perhitungan poin, nyawa, dan leveling.',
+                        tfAnswer: true,
+                        catchTargets: ['⚙️ Logika', '❤️ Nyawa HP', '🪙 Skor'],
+                        catchAvoid: ['🐛 Bug', '🔌 Putus'],
+                        pairs: [
+                            { left: 'Health (HP)', right: 'Sistem ketahanan nyawa karakter' },
+                            { left: 'Scoring', right: 'Perhitungan nilai & pencapaian poin' },
+                            { left: 'Balancing', right: 'Penyeimbang tingkat kesulitan & hadiah' }
+                        ]
+                    },
+                    { 
+                        id: 'dev-teknik', 
+                        letter: '04', 
+                        building: 'Core Engineering Bay',
+                        name: 'Teknik Gim', 
+                        enName: 'Game Technical Concept',
+                        npcName: 'Dina • Technical Director',
+                        npcHint: 'Dari sisi rekayasa perangkat lunak, pemilihan game engine, bahasa pemrograman, target FPS, dan spesifikasi hardware masuk ke dalam Teknik Gim.',
+                        question: 'Pemilihan game engine, arsitektur kode, dan spesifikasi perangkat keras termasuk dalam...',
+                        options: ['Teknik Gim', 'Konsep Gim', 'Desain Gim'],
+                        wordQuestion: 'Perangkat lunak inti kerangka kerja (seperti Unity, Godot, atau Unreal) untuk membangun gim disebut...',
+                        word: 'ENGINE', 
+                        emoji: '💻',
+                        color: 'from-violet-600 via-purple-700 to-indigo-800',
+                        tfStatement: 'Teknik Gim (Technical Concept) menentukan arsitektur perangkat lunak, FPS target, dan platform rilis gim.',
+                        tfAnswer: true,
+                        catchTargets: ['💻 Engine', '⚡ Optimasi', '📱 Platform'],
+                        catchAvoid: ['🐌 Lag', '💥 Crash'],
+                        pairs: [
+                            { left: 'Game Engine', right: 'Perangkat lunak inti pembuat gim' },
+                            { left: 'FPS', right: 'Kecepatan tampilan frame per detik' },
+                            { left: 'Debugging', right: 'Proses mencari & memperbaiki bug kode' }
+                        ]
+                    },
+                    { 
+                        id: 'dev-level', 
+                        letter: '05', 
+                        building: 'World & Level Architecture',
+                        name: 'Level Gim', 
+                        enName: 'Game Level Concept',
+                        npcName: 'Eko • Lead Level Architect',
+                        npcHint: 'Arsitektur ruang bermain sangat krusial: menyusun tata letak pijakan, rintangan, checkpoint, dan ritme kesulitan bertahap adalah tugas Level Gim.',
+                        question: 'Perancangan tata letak arena, rintangan, dan peningkatan kesulitan bertahap disebut...',
+                        options: ['Level Gim', 'Pustaka', 'Sistem Gim'],
+                        wordQuestion: 'Rancangan ruang bermain, tata letak pijakan, dan rintangan bertahap dalam sebuah gim disebut...',
+                        word: 'ARENA', 
+                        emoji: '🗺️',
+                        color: 'from-rose-600 via-pink-700 to-rose-800',
+                        tfStatement: 'Level Gim yang baik menempatkan tantangan secara bertahap dari mudah (tutorial) hingga sulit (boss stage).',
+                        tfAnswer: true,
+                        catchTargets: ['🗺️ Peta', '🧱 Rintangan', '🚩 Checkpoint'],
+                        catchAvoid: ['🕳️ Jebakan', '🐛 Bug'],
+                        pairs: [
+                            { left: 'Checkpoint', right: 'Titik simpan kemajuan di tengah arena' },
+                            { left: 'Pacing', right: 'Ritme naik-turun ketegangan permainan' },
+                            { left: 'Layout', right: 'Tata letak pijakan, musuh, dan hadiah' }
+                        ]
+                    },
+                    { 
+                        id: 'dev-narasi', 
+                        letter: '06', 
+                        building: 'Narrative & Lore Writing Room',
+                        name: 'Narasi Gim', 
+                        enName: 'Game Narrative Concept',
+                        npcName: 'Maya • Narrative Director',
+                        npcHint: 'Dunia gim terasa hidup berkat cerita! Alur plot, sejarah dunia (lore), naskah dialog NPC, dan penokohan karakter adalah inti Narasi Gim.',
+                        question: 'Alur cerita, latar dunia (lore), dialog, dan penokohan karakter dalam gim disebut...',
+                        options: ['Narasi Gim', 'Teknik Gim', 'Level Gim'],
+                        wordQuestion: 'Percakapan interaktif antar tokoh atau dengan NPC untuk menyampaikan cerita dalam gim disebut...',
+                        word: 'DIALOG', 
+                        emoji: '📖',
+                        color: 'from-fuchsia-600 via-purple-700 to-slate-800',
+                        tfStatement: 'Narasi Gim hanya berisi teks panjang dan tidak berhubungan dengan karakter maupun latar tempat gim.',
+                        tfAnswer: false,
+                        catchTargets: ['📖 Alur Cerita', '💬 Dialog', '🦸 Karakter'],
+                        catchAvoid: ['💤 Bosan', '❌ Plot Hole'],
+                        pairs: [
+                            { left: 'Lore', right: 'Sejarah & latar belakang dunia gim' },
+                            { left: 'Dialog NPC', right: 'Percakapan karakter pendukung' },
+                            { left: 'Cutscene', right: 'Adegan sinematik penyampai cerita' }
+                        ]
+                    },
+                    { 
+                        id: 'dev-pustaka', 
+                        letter: '07', 
+                        building: 'SDK & Middleware Hub',
+                        name: 'Pemanfaatan Pustaka', 
+                        enName: 'Library',
+                        npcName: 'Rio • Engine & SDK Specialist',
+                        npcHint: 'Produksi modern mengandalkan efisiensi: memanfaatkan kumpulan kode siap pakai seperti Phaser.js, Three.js, atau Cannon.js disebut Pemanfaatan Pustaka.',
+                        question: 'Penggunaan kumpulan kode siap pakai (seperti Phaser, Three.js, atau Cannon.js) disebut...',
+                        options: ['Pemanfaatan Pustaka', 'Narasi Gim', 'Konsep Gim'],
+                        wordQuestion: 'Kumpulan modul atau kode siap pakai (seperti Three.js atau Phaser) untuk mempercepat produksi disebut...',
+                        word: 'PUSTAKA', 
+                        emoji: '📚',
+                        color: 'from-cyan-600 via-sky-700 to-slate-800',
+                        tfStatement: 'Pemanfaatan Pustaka (Library) membantu developer mempercepat pembuatan fisika, grafis 3D, dan audio tanpa menulis dari nol.',
+                        tfAnswer: true,
+                        catchTargets: ['📚 Phaser.js', '🧊 Three.js', '🔊 Tone.js'],
+                        catchAvoid: ['🦠 Malware', '⚠️ Error'],
+                        pairs: [
+                            { left: 'Phaser.js', right: 'Pustaka populer untuk gim web 2D' },
+                            { left: 'Three.js', right: 'Pustaka untuk grafis & simulasi 3D' },
+                            { left: 'Cannon.js', right: 'Pustaka simulasi fisika & gravitasi' }
+                        ]
+                    }
+                ];
+
+                this.completedStations = this.loadProgress();
+                this.currentStationIndex = 0;
+                this.currentStage = 1;
+                this.currentInstructionText = '';
+                this.userSpellingSlot = [];
+                this.selectedLeftIdx = null;
+                this.matchedPairCount = 0;
+
+                this.initUI();
+            }
+
+            loadProgress() {
+                try {
+                    const saved = localStorage.getItem('studio_dev_gim_progress_v3');
+                    return saved ? JSON.parse(saved) : [];
+                } catch (e) {
+                    return [];
+                }
+            }
+
+            saveProgress() {
+                try {
+                    localStorage.setItem('studio_dev_gim_progress_v3', JSON.stringify(this.completedStations));
+                } catch (e) {}
+            }
+
+            initUI() {
+                this.updateStarCounter();
+                this.renderMapGrid();
+            }
+
+            updateStarCounter() {
+                const stars = this.completedStations.length * 3;
+                const maxStars = this.stations.length * 3;
+                const el = document.getElementById('total-stars');
+                if (el) el.innerText = `${stars} / ${maxStars}`;
+
+                const mapBadge = document.getElementById('map-completion-badge');
+                if (mapBadge) {
+                    mapBadge.innerText = `${this.completedStations.length} / ${this.stations.length} Divisi Selesai`;
+                }
+            }
+
+            toggleMute() {
+                this.sound.muted = !this.sound.muted;
+                this.speech.muted = this.sound.muted;
+                const btn = document.getElementById('btn-mute');
+                if (btn) btn.innerText = this.sound.muted ? '🔇' : '🔊';
+                if (!this.sound.muted) this.sound.playPop();
+            }
+
+            startAdventure() {
+                this.sound.init();
+                this.sound.playSuccess();
+                this.speech.speak('Selamat datang di Studio Kota Gim! Pilih departemen materi untuk memulai.');
+                this.showMap();
+            }
+
+            stopAllMiniGames() {
+                if (this.platformerAnimId) {
+                    cancelAnimationFrame(this.platformerAnimId);
+                    this.platformerAnimId = null;
+                }
+                if (this.keyDownHandler) {
+                    window.removeEventListener('keydown', this.keyDownHandler);
+                    this.keyDownHandler = null;
+                }
+                if (this.keyUpHandler) {
+                    window.removeEventListener('keyup', this.keyUpHandler);
+                    this.keyUpHandler = null;
+                }
+                this.stopCatcherGame();
+            }
+
+            stopCatcherGame() {
+                if (this.catcherAnimId) {
+                    cancelAnimationFrame(this.catcherAnimId);
+                    this.catcherAnimId = null;
+                }
+                if (this.catcherSpawnTimer) {
+                    clearInterval(this.catcherSpawnTimer);
+                    this.catcherSpawnTimer = null;
+                }
+            }
+
+            showMap() {
+                this.stopAllMiniGames();
+                document.getElementById('screen-welcome').classList.add('hidden');
+                document.getElementById('screen-game').classList.add('hidden');
+                document.getElementById('screen-map').classList.remove('hidden');
+                this.updateStarCounter();
+                this.renderMapGrid();
+            }
+
+            renderMapGrid() {
+                const grid = document.getElementById('map-grid');
+                if (!grid) return;
+                grid.innerHTML = '';
+
+                this.stations.forEach((st, idx) => {
+                    const isDone = this.completedStations.includes(st.id);
+                    const card = document.createElement('button');
+                    card.onclick = () => this.startStation(idx);
+                    card.className = `station-card bg-gradient-to-br ${st.color} text-white rounded-[1.75rem] p-5 border-4 border-white flex flex-col justify-between text-left relative overflow-hidden group`;
+
+                    card.innerHTML = `
+                        <div class="flex items-start justify-between w-full mb-4 relative z-10">
+                            <div class="flex flex-col gap-1">
+                                <span class="font-mono-code bg-black/30 backdrop-blur-sm text-white/95 font-bold text-[10px] px-2.5 py-1 rounded-lg w-fit border border-white/15">
+                                    DIVISI ${st.letter} • ${st.building}
+                                </span>
+                                <h3 class="font-extrabold text-xl md:text-2xl leading-tight mt-1.5 tracking-tight">${st.name}</h3>
+                                <p class="font-mono-code text-xs font-semibold text-white/80">${st.enName}</p>
+                            </div>
+                            <div class="w-13 h-13 p-2.5 rounded-2xl bg-white/15 backdrop-blur-md border border-white/30 flex items-center justify-center text-3xl shadow-lg group-hover:scale-105 transition-transform shrink-0">
+                                ${st.emoji}
+                            </div>
+                        </div>
+
+                        <div class="mt-2 pt-3 border-t border-white/20 flex items-center justify-between w-full text-xs font-bold relative z-10">
+                            <span class="flex items-center gap-1.5 bg-black/25 px-3 py-1 rounded-lg">
+                                ${isDone ? '⭐⭐⭐ Terverifikasi' : '📋 5 Tahap Simulasi'}
+                            </span>
+                            <span class="bg-white text-slate-900 group-hover:bg-sky-100 px-3.5 py-1.5 rounded-lg font-extrabold shadow transition-colors">
+                                ${isDone ? 'Tinjau ↻' : 'Masuk ➡️'}
+                            </span>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+
+            startStation(index) {
+                this.stopAllMiniGames();
+                this.sound.playPop();
+                this.currentStationIndex = index;
+                this.currentStage = 1;
+
+                const st = this.stations[index];
+                document.getElementById('screen-map').classList.add('hidden');
+                document.getElementById('screen-game').classList.remove('hidden');
+
+                document.getElementById('station-badge-emoji').innerText = st.emoji;
+                document.getElementById('station-badge-title').innerText = st.name;
+                document.getElementById('station-badge-sub').innerText = st.enName;
+
+                this.loadStage();
+            }
+
+            replayInstruction() {
+                this.sound.playPop();
+                if (this.currentInstructionText) {
+                    this.speech.speak(this.currentInstructionText);
+                }
+            }
+
+            renderStageDots() {
+                const dotsContainer = document.getElementById('stage-dots');
+                if (!dotsContainer) return;
+                dotsContainer.innerHTML = [1, 2, 3, 4, 5].map(num => {
+                    const isCompleted = num < this.currentStage;
+                    const isCurrent = num === this.currentStage;
+                    let cls = 'w-6 h-2.5 rounded-full transition-all ';
+                    if (isCompleted) cls += 'bg-emerald-500';
+                    else if (isCurrent) cls += 'bg-amber-400 w-8 ring-2 ring-amber-200';
+                    else cls += 'bg-slate-200';
+                    return `<span class="${cls}"></span>`;
+                }).join('');
+            }
+
+            loadStage() {
+                this.stopAllMiniGames();
+                this.renderStageDots();
+
+                const st = this.stations[this.currentStationIndex];
+                const container = document.getElementById('game-stage-container');
+                const stageBadge = document.getElementById('stage-badge');
+
+                const stageNames = [
+                    'Tahap 1/5 • Platformer & NPC',
+                    'Tahap 2/5 • Susun Kata',
+                    'Tahap 3/5 • Benar / Salah',
+                    'Tahap 4/5 • Tangkap Artefak',
+                    'Tahap 5/5 • Pasangkan Istilah'
+                ];
+                if (stageBadge) stageBadge.innerText = stageNames[this.currentStage - 1] || `Tahap ${this.currentStage}/5`;
+
+                if (this.currentStage === 1) {
+                    this.renderStage1(st, container);
+                } else if (this.currentStage === 2) {
+                    this.renderStage2(st, container);
+                } else if (this.currentStage === 3) {
+                    this.renderStage3(st, container);
+                } else if (this.currentStage === 4) {
+                    this.renderStage4(st, container);
+                } else {
+                    this.renderStage5(st, container);
+                }
+            }
+
+            advanceStage() {
+                this.stopAllMiniGames();
+                if (this.currentStage < 5) {
+                    this.currentStage++;
+                    this.loadStage();
+                } else {
+                    const st = this.stations[this.currentStationIndex];
+                    if (!this.completedStations.includes(st.id)) {
+                        this.completedStations.push(st.id);
+                        this.saveProgress();
+                        this.updateStarCounter();
+                    }
+                    this.showWinModal();
+                }
+            }
+
+            drawPillRect(ctx, x, y, w, h, r) {
+                const radius = Math.min(r, w / 2, h / 2);
+                ctx.beginPath();
+                ctx.moveTo(x + radius, y);
+                ctx.lineTo(x + w - radius, y);
+                ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+                ctx.lineTo(x + w, y + h - radius);
+                ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+                ctx.lineTo(x + radius, y + h);
+                ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+                ctx.lineTo(x, y + radius);
+                ctx.quadraticCurveTo(x, y, x + radius, y);
+                ctx.closePath();
+            }
+
+            // -----------------------------------------------------------------
+            // STAGE 1: MINI-GAME 2D PLATFORMER EKSPLORASI STUDIO & NPC MENTOR
+            // -----------------------------------------------------------------
+            renderStage1(st, container) {
+                this.currentInstructionText = `Temui ${st.npcName} di dalam studio untuk mendapatkan petunjuk, lalu lompati platform dan sundul kotak jawaban yang tepat!`;
+                this.speech.speak(this.currentInstructionText);
+                document.getElementById('prompt-text-spoken').innerText = `Misi 2D Platformer: Tanya NPC & Jawab Kuis`;
+
+                container.innerHTML = `
+                    <div class="w-full flex flex-col items-center animate-pop-in">
+                        <!-- Mission Question Banner -->
+                        <div class="w-full bg-slate-900 text-white rounded-2xl p-3.5 md:p-4 border border-slate-700 shadow-lg mb-2.5 flex flex-col md:flex-row items-center justify-between gap-2">
+                            <div class="text-left">
+                                <span class="font-mono-code text-[10px] font-bold text-amber-400 uppercase tracking-widest block">
+                                    PERTANYAAN UJUNG LEVEL • ${st.name}
+                                </span>
+                                <p class="text-xs md:text-sm font-bold text-slate-100 leading-snug">
+                                    "${st.question}"
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <div id="platformer-hud-checkpoint" class="font-mono-code bg-sky-500/20 text-sky-300 border border-sky-400/40 px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold">
+                                    🚩 Start
+                                </div>
+                                <div id="platformer-hud-coins" class="font-mono-code bg-amber-500/20 text-amber-300 border border-amber-400/40 px-3 py-1.5 rounded-xl text-xs font-extrabold">
+                                    🪙 Ide: 0/6
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- NPC Dialog Box (Hidden until player talks to NPC) -->
+                        <div id="npc-dialog-box" class="hidden w-full bg-sky-950/95 text-white border-2 border-sky-400 rounded-2xl p-3.5 mb-2.5 shadow-xl animate-pop-in">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="flex items-start gap-2.5">
+                                    <div class="w-9 h-9 rounded-xl bg-sky-500/30 border border-sky-300/40 flex items-center justify-center text-lg shrink-0">
+                                        🧑‍🏫
+                                    </div>
+                                    <div class="text-left">
+                                        <span class="font-mono-code text-[11px] font-extrabold text-sky-300 block">${st.npcName}</span>
+                                        <p id="npc-dialog-text" class="text-xs md:text-sm text-slate-100 font-medium leading-relaxed mt-0.5">${st.npcHint}</p>
+                                    </div>
+                                </div>
+                                <button onclick="document.getElementById('npc-dialog-box').classList.add('hidden')" class="text-slate-300 hover:text-white font-bold text-xs bg-white/10 px-2.5 py-1 rounded-lg">
+                                    Tutup ✕
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 2D Platformer Canvas -->
+                        <div class="relative w-full rounded-2xl overflow-hidden border-4 border-sky-400 shadow-2xl bg-sky-300">
+                            <canvas id="platformer-canvas" class="w-full h-[265px] md:h-[295px] block"></canvas>
+
+                            <!-- Floating Interact Button when near NPC -->
+                            <button id="btn-talk-npc" class="hidden absolute top-3 left-1/2 -translate-x-1/2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold px-4 py-2 rounded-xl shadow-lg border-2 border-white text-xs md:text-sm animate-bounce flex items-center gap-1.5">
+                                <span>💬 Tanya Mentor (E)</span>
+                            </button>
+
+                            <div id="platformer-feedback" class="hidden absolute bottom-3 left-1/2 -translate-x-1/2 bg-slate-900/95 text-white font-extrabold px-4 py-2 rounded-xl border border-slate-600 text-xs md:text-sm shadow-xl whitespace-nowrap">
+                            </div>
+                        </div>
+
+                        <!-- Mobile & Desktop Touch Controls -->
+                        <div class="w-full flex items-center justify-between gap-2 mt-3">
+                            <div class="flex items-center gap-2">
+                                <button id="ctrl-left" class="btn-chunky bg-slate-800 hover:bg-slate-700 text-white font-extrabold w-14 h-12 rounded-xl border border-slate-600 text-lg select-none">
+                                    ⬅️
+                                </button>
+                                <button id="ctrl-right" class="btn-chunky bg-slate-800 hover:bg-slate-700 text-white font-extrabold w-14 h-12 rounded-xl border border-slate-600 text-lg select-none">
+                                    ➡️
+                                </button>
+                            </div>
+                            <span class="hidden sm:inline font-mono-code text-[11px] text-slate-500 font-semibold">
+                                Keyboard: A/D atau Panah • Lompat: Spasi/W • Tanya NPC: E
+                            </span>
+                            <div class="flex items-center gap-2">
+                                <button id="ctrl-talk" class="btn-chunky bg-sky-600 hover:bg-sky-500 text-white font-extrabold px-4 h-12 rounded-xl border border-sky-400 text-xs md:text-sm select-none">
+                                    💬 Tanya NPC
+                                </button>
+                                <button id="ctrl-jump" class="btn-chunky bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-5 h-12 rounded-xl border border-emerald-400 text-sm select-none">
+                                    ⬆️ Lompat
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                this.initPlatformerEngine(st);
+            }
+
+            initPlatformerEngine(st) {
+                const canvas = document.getElementById('platformer-canvas');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+
+                const W = 680;
+                const H = 295;
+                canvas.width = W;
+                canvas.height = H;
+
+                const WORLD_W = 2480;
+                const GROUND_Y = 248;
+
+                let cameraX = 0;
+                let completed = false;
+                let coinsCollected = 0;
+                let npcTalked = false;
+                let animTick = 0;
+                let respawnPoint = { x: 65, y: GROUND_Y - 46 };
+                let checkpointReached = false;
+
+                const player = {
+                    x: 65,
+                    y: GROUND_Y - 46,
+                    w: 28,
+                    h: 46,
+                    vx: 0,
+                    vy: 0,
+                    speed: 4.3,
+                    jumpPower: -11.2,
+                    onGround: false,
+                    facing: 1,
+                    invuln: 0
+                };
+
+                const npc = {
+                    x: 310,
+                    y: GROUND_Y - 48,
+                    w: 30,
+                    h: 48
+                };
+
+                // Ground segments with gaps (jurang rintangan)
+                const groundSegments = [
+                    { x: 0, w: 540 },
+                    { x: 635, w: 430 },
+                    { x: 1185, w: 450 },
+                    { x: 1750, w: 730 }
+                ];
+
+                // Static & Moving Platforms
+                const platforms = [
+                    { x: 525, y: 196, w: 115, h: 16, baseX: 525, moveRange: 0, moveSpeed: 0 },
+                    { x: 760, y: 186, w: 120, h: 16, baseX: 760, moveRange: 0, moveSpeed: 0 },
+                    { x: 920, y: 144, w: 120, h: 16, baseX: 920, moveRange: 0, moveSpeed: 0 },
+                    { x: 1085, y: 178, w: 110, h: 16, baseX: 1085, moveRange: 45, moveSpeed: 0.035 },
+                    { x: 1360, y: 186, w: 125, h: 16, baseX: 1360, moveRange: 0, moveSpeed: 0 },
+                    { x: 1635, y: 182, w: 115, h: 16, baseX: 1635, moveRange: 50, moveSpeed: 0.04 }
+                ];
+
+                // Patrolling Bug Enemies & Spike Hazards
+                const bugs = [
+                    { x: 740, y: GROUND_Y - 24, w: 28, h: 24, minX: 660, maxX: 1020, vx: 1.6 },
+                    { x: 1320, y: GROUND_Y - 24, w: 28, h: 24, minX: 1210, maxX: 1590, vx: -1.9 },
+                    { x: 1810, y: GROUND_Y - 24, w: 28, h: 24, minX: 1770, maxX: 1930, vx: 1.7 }
+                ];
+
+                // Mid-level Checkpoint Flag
+                const checkpoint = { x: 1235, y: GROUND_Y - 56 };
+
+                // Collectible idea coins along the extended course
+                const coins = [
+                    { x: 215, y: GROUND_Y - 26, collected: false },
+                    { x: 582, y: 162, collected: false },
+                    { x: 980, y: 110, collected: false },
+                    { x: 1140, y: 140, collected: false },
+                    { x: 1422, y: 152, collected: false },
+                    { x: 1690, y: 145, collected: false }
+                ];
+
+                // Shuffled 3 Answer Blocks at the far end of the level
+                const shuffledOpts = [...st.options].sort(() => 0.5 - Math.random());
+                const correctAnswer = st.options[0];
+                const answerBlocks = shuffledOpts.map((label, idx) => ({
+                    x: 1975 + idx * 155,
+                    y: 146,
+                    w: 132,
+                    h: 36,
+                    label,
+                    isCorrect: label === correctAnswer,
+                    bumpY: 0,
+                    hitWrong: false
+                }));
+
+                const particles = [];
+                const spawnParticles = (px, py, color) => {
+                    for (let i = 0; i < 14; i++) {
+                        particles.push({
+                            x: px,
+                            y: py,
+                            vx: (Math.random() - 0.5) * 6,
+                            vy: (Math.random() - 1) * 5,
+                            life: 28,
+                            color
+                        });
+                    }
+                };
+
+                const showTemporaryMsg = (text, isError = false) => {
+                    const fb = document.getElementById('platformer-feedback');
+                    if (!fb) return;
+                    fb.innerText = text;
+                    fb.className = isError
+                        ? 'absolute bottom-3 left-1/2 -translate-x-1/2 bg-rose-600 text-white font-extrabold px-4 py-2 rounded-xl border-2 border-white text-xs md:text-sm shadow-xl whitespace-nowrap'
+                        : 'absolute bottom-3 left-1/2 -translate-x-1/2 bg-slate-900/95 text-white font-extrabold px-4 py-2 rounded-xl border-2 border-sky-300 text-xs md:text-sm shadow-xl whitespace-nowrap';
+                    fb.classList.remove('hidden');
+                    setTimeout(() => fb.classList.add('hidden'), 2000);
+                };
+
+                const triggerNpcDialog = () => {
+                    const dist = Math.abs((player.x + player.w / 2) - (npc.x + npc.w / 2));
+                    if (dist <= 95) {
+                        npcTalked = true;
+                        this.sound.playPop();
+                        const box = document.getElementById('npc-dialog-box');
+                        if (box) box.classList.remove('hidden');
+                        this.speech.speak(st.npcHint);
+                    } else {
+                        showTemporaryMsg('🚶 Dekati Mentor terlebih dahulu untuk bertanya!');
+                    }
+                };
+
+                const respawnPlayer = (reasonText) => {
+                    this.sound.playWrong();
+                    spawnParticles(player.x + player.w / 2, player.y + player.h / 2, '#fb7185');
+                    player.x = respawnPoint.x;
+                    player.y = respawnPoint.y;
+                    player.vx = 0;
+                    player.vy = 0;
+                    player.invuln = 45;
+                    showTemporaryMsg(reasonText, true);
+                };
+
+                const keys = { left: false, right: false };
+                const doJump = () => {
+                    if (player.onGround && !completed) {
+                        player.vy = player.jumpPower;
+                        player.onGround = false;
+                        this.sound.playJump();
+                    }
+                };
+
+                this.keyDownHandler = (e) => {
+                    if (['ArrowLeft', 'KeyA'].includes(e.code)) keys.left = true;
+                    if (['ArrowRight', 'KeyD'].includes(e.code)) keys.right = true;
+                    if (['Space', 'ArrowUp', 'KeyW'].includes(e.code)) {
+                        e.preventDefault();
+                        doJump();
+                    }
+                    if (['KeyE', 'Enter'].includes(e.code)) {
+                        triggerNpcDialog();
+                    }
+                };
+
+                this.keyUpHandler = (e) => {
+                    if (['ArrowLeft', 'KeyA'].includes(e.code)) keys.left = false;
+                    if (['ArrowRight', 'KeyD'].includes(e.code)) keys.right = false;
+                };
+
+                window.addEventListener('keydown', this.keyDownHandler);
+                window.addEventListener('keyup', this.keyUpHandler);
+
+                // Bind on-screen touch/mouse buttons
+                const bindHoldBtn = (id, keyName) => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    const start = (e) => { e.preventDefault(); keys[keyName] = true; };
+                    const end = (e) => { e.preventDefault(); keys[keyName] = false; };
+                    el.addEventListener('mousedown', start);
+                    el.addEventListener('mouseup', end);
+                    el.addEventListener('mouseleave', end);
+                    el.addEventListener('touchstart', start, { passive: false });
+                    el.addEventListener('touchend', end, { passive: false });
+                };
+                bindHoldBtn('ctrl-left', 'left');
+                bindHoldBtn('ctrl-right', 'right');
+
+                const jumpBtn = document.getElementById('ctrl-jump');
+                if (jumpBtn) {
+                    jumpBtn.addEventListener('mousedown', (e) => { e.preventDefault(); doJump(); });
+                    jumpBtn.addEventListener('touchstart', (e) => { e.preventDefault(); doJump(); }, { passive: false });
+                }
+
+                const talkBtn = document.getElementById('ctrl-talk');
+                if (talkBtn) talkBtn.addEventListener('click', triggerNpcDialog);
+                const floatTalkBtn = document.getElementById('btn-talk-npc');
+                if (floatTalkBtn) floatTalkBtn.addEventListener('click', triggerNpcDialog);
+
+                const drawOutdoorCharacter = (x, y, facing, isWalking, isNpc) => {
+                    ctx.save();
+                    // Ground shadow
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.25)';
+                    ctx.beginPath();
+                    ctx.ellipse(x + 14, y + 46, 13, 4, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    const legSwing = isWalking ? Math.sin(animTick * 0.35) * 4 : 0;
+
+                    // Legs
+                    ctx.fillStyle = isNpc ? '#1e3a8a' : '#1e293b';
+                    ctx.fillRect(x + 7, y + 30 + legSwing, 6, 15 - legSwing);
+                    ctx.fillRect(x + 15, y + 30 - legSwing, 6, 15 + legSwing);
+
+                    // Shoes
+                    ctx.fillStyle = isNpc ? '#f59e0b' : '#ef4444';
+                    ctx.fillRect(x + 6, y + 43, 8, 3);
+                    ctx.fillRect(x + 14, y + 43, 8, 3);
+
+                    // Cheerful Studio Hoodie / Shirt
+                    ctx.fillStyle = isNpc ? '#0284c7' : '#f97316';
+                    this.drawPillRect(ctx, x + 5, y + 15, 18, 17, 5);
+                    ctx.fill();
+
+                    // Head
+                    ctx.fillStyle = '#fed7aa';
+                    ctx.beginPath();
+                    ctx.arc(x + 14, y + 8, 8, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Developer Cap / Hair
+                    ctx.fillStyle = isNpc ? '#334155' : '#2563eb';
+                    ctx.beginPath();
+                    ctx.arc(x + 14, y + 6.5, 8.2, Math.PI, Math.PI * 2);
+                    ctx.fill();
+                    // Cap Visor
+                    ctx.fillRect(facing >= 0 ? x + 13 : x + 4, y + 5, 11, 2.5);
+
+                    // Eye
+                    const eyeX = facing >= 0 ? x + 17 : x + 9;
+                    ctx.fillStyle = '#0f172a';
+                    ctx.fillRect(eyeX, y + 7.5, 2.5, 2.5);
+                    ctx.restore();
+                };
+
+                const loop = () => {
+                    animTick++;
+                    if (player.invuln > 0) player.invuln--;
+
+                    // Update moving platforms
+                    platforms.forEach(plat => {
+                        plat.prevX = plat.x;
+                        if (plat.moveRange > 0) {
+                            plat.x = plat.baseX + Math.sin(animTick * plat.moveSpeed) * plat.moveRange;
+                        }
+                        plat.deltaX = plat.x - plat.prevX;
+                    });
+
+                    // Horizontal Movement
+                    if (keys.left) {
+                        player.vx = -player.speed;
+                        player.facing = -1;
+                    } else if (keys.right) {
+                        player.vx = player.speed;
+                        player.facing = 1;
+                    } else {
+                        player.vx *= 0.78;
+                        if (Math.abs(player.vx) < 0.1) player.vx = 0;
+                    }
+
+                    player.x += player.vx;
+                    player.x = Math.max(12, Math.min(WORLD_W - player.w - 12, player.x));
+
+                    // Gravity & Vertical Movement
+                    const prevY = player.y;
+                    player.vy += 0.56;
+                    player.y += player.vy;
+                    player.onGround = false;
+
+                    // Ground Segments Collision (with pits!)
+                    groundSegments.forEach(seg => {
+                        if (
+                            player.vy >= 0 &&
+                            prevY + player.h <= GROUND_Y + 8 &&
+                            player.y + player.h >= GROUND_Y &&
+                            player.x + player.w - 5 >= seg.x &&
+                            player.x + 5 <= seg.x + seg.w
+                        ) {
+                            player.y = GROUND_Y - player.h;
+                            player.vy = 0;
+                            player.onGround = true;
+                        }
+                    });
+
+                    // Fall into pit check
+                    if (player.y > H + 20 && !completed) {
+                        respawnPlayer('⚠️ Jatuh ke jurang! Lompati celah dengan hati-hati.');
+                    }
+
+                    // One-way Elevated & Moving Platforms Collision
+                    platforms.forEach(plat => {
+                        if (
+                            player.vy >= 0 &&
+                            prevY + player.h <= plat.y + 8 &&
+                            player.y + player.h >= plat.y &&
+                            player.x + player.w - 4 >= plat.x &&
+                            player.x + 4 <= plat.x + plat.w
+                        ) {
+                            player.y = plat.y - player.h;
+                            player.vy = 0;
+                            player.onGround = true;
+                            player.x += plat.deltaX || 0;
+                        }
+                    });
+
+                    // Patrolling Bug Enemies Update & Collision
+                    bugs.forEach(bug => {
+                        bug.x += bug.vx;
+                        if (bug.x <= bug.minX || bug.x + bug.w >= bug.maxX) {
+                            bug.vx *= -1;
+                        }
+
+                        const hitX = player.x + player.w - 4 > bug.x && player.x + 4 < bug.x + bug.w;
+                        const hitY = player.y + player.h - 2 > bug.y && player.y + 4 < bug.y + bug.h;
+
+                        if (hitX && hitY && !completed) {
+                            // Stomp bug from above!
+                            if (player.vy > 0 && prevY + player.h <= bug.y + 12) {
+                                player.vy = -8.5;
+                                this.sound.playCoin();
+                                spawnParticles(bug.x + bug.w / 2, bug.y, '#a855f7');
+                                showTemporaryMsg('💥 Bug berhasil diinjak & dibersihkan!');
+                                bug.y = 9999; // defeat bug
+                            } else if (player.invuln === 0) {
+                                respawnPlayer('🐛 Tersentuh Bug! Injak dari atas atau lompati.');
+                            }
+                        }
+                    });
+
+                    // Mid-level Checkpoint Activation
+                    if (!checkpointReached && Math.abs(player.x - checkpoint.x) < 34) {
+                        checkpointReached = true;
+                        respawnPoint = { x: checkpoint.x - 10, y: GROUND_Y - 46 };
+                        this.sound.playCoin();
+                        spawnParticles(checkpoint.x, checkpoint.y + 15, '#10b981');
+                        const cpHud = document.getElementById('platformer-hud-checkpoint');
+                        if (cpHud) {
+                            cpHud.innerText = '🚩 Checkpoint!';
+                            cpHud.className = 'font-mono-code bg-emerald-500/25 text-emerald-300 border border-emerald-400/50 px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold';
+                        }
+                        showTemporaryMsg('🚩 Checkpoint tercapai! Posisi tersimpan.');
+                    }
+
+                    // Answer Blocks Collision (Headbutt from below OR landing on top)
+                    answerBlocks.forEach(blk => {
+                        if (blk.bumpY < 0) blk.bumpY += 1.5;
+                        const overlapX = player.x + player.w - 4 >= blk.x && player.x + 4 <= blk.x + blk.w;
+
+                        // Hit from below
+                        if (
+                            overlapX &&
+                            player.vy < 0 &&
+                            prevY >= blk.y + blk.h - 6 &&
+                            player.y <= blk.y + blk.h
+                        ) {
+                            player.y = blk.y + blk.h;
+                            player.vy = 2;
+                            blk.bumpY = -10;
+
+                            if (blk.isCorrect && !completed) {
+                                completed = true;
+                                this.sound.playSuccess();
+                                spawnParticles(blk.x + blk.w / 2, blk.y, '#10b981');
+                                this.speech.speak(`Benar sekali! Jawabannya adalah ${blk.label}!`);
+                                const fb = document.getElementById('platformer-feedback');
+                                if (fb) {
+                                    fb.innerText = `🎉 Tepat! "${blk.label}" adalah jawaban yang benar!`;
+                                    fb.className = 'absolute bottom-3 left-1/2 -translate-x-1/2 bg-emerald-600 text-white font-extrabold px-4 py-2 rounded-xl border-2 border-white text-xs md:text-sm shadow-xl whitespace-nowrap';
+                                    fb.classList.remove('hidden');
+                                }
+                                setTimeout(() => this.advanceStage(), 1250);
+                            } else if (!blk.isCorrect) {
+                                blk.hitWrong = true;
+                                this.sound.playWrong();
+                                spawnParticles(blk.x + blk.w / 2, blk.y + blk.h, '#fb7185');
+                                showTemporaryMsg(`❌ "${blk.label}" kurang tepat! Coba kotak lain.`, true);
+                            }
+                        }
+
+                        // Stand on top of answer block
+                        if (
+                            overlapX &&
+                            player.vy >= 0 &&
+                            prevY + player.h <= blk.y + 6 &&
+                            player.y + player.h >= blk.y
+                        ) {
+                            player.y = blk.y - player.h;
+                            player.vy = 0;
+                            player.onGround = true;
+                        }
+                    });
+
+                    // Coins Collection
+                    coins.forEach(c => {
+                        if (!c.collected) {
+                            const dx = (player.x + player.w / 2) - c.x;
+                            const dy = (player.y + player.h / 2) - c.y;
+                            if (Math.hypot(dx, dy) < 28) {
+                                c.collected = true;
+                                coinsCollected++;
+                                this.sound.playCoin();
+                                spawnParticles(c.x, c.y, '#fbbf24');
+                                const hud = document.getElementById('platformer-hud-coins');
+                                if (hud) hud.innerText = `🪙 Ide: ${coinsCollected}/6`;
+                            }
+                        }
+                    });
+
+                    // Toggle floating NPC prompt button when close
+                    const distNpc = Math.abs((player.x + player.w / 2) - (npc.x + npc.w / 2));
+                    if (floatTalkBtn) {
+                        if (distNpc <= 95 && !completed) floatTalkBtn.classList.remove('hidden');
+                        else floatTalkBtn.classList.add('hidden');
+                    }
+
+                    // Smooth Camera Follow
+                    const targetCam = Math.max(0, Math.min(WORLD_W - W, player.x - W * 0.34));
+                    cameraX += (targetCam - cameraX) * 0.15;
+
+                    // ---------------- RENDER SUNNY STUDIO CITY BACKGROUND ----------------
+                    const skyGrad = ctx.createLinearGradient(0, 0, 0, H);
+                    skyGrad.addColorStop(0, '#38bdf8');
+                    skyGrad.addColorStop(0.65, '#bae6fd');
+                    skyGrad.addColorStop(1, '#e0f2fe');
+                    ctx.fillStyle = skyGrad;
+                    ctx.fillRect(0, 0, W, H);
+
+                    // Warm Sun
+                    ctx.fillStyle = '#fde047';
+                    ctx.beginPath();
+                    ctx.arc(590, 48, 26, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = 'rgba(253, 224, 71, 0.3)';
+                    ctx.beginPath();
+                    ctx.arc(590, 48, 36, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Fluffy Parallax Clouds
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                    for (let cx = 60; cx < WORLD_W; cx += 280) {
+                        const sx = cx - cameraX * 0.3 + Math.sin(animTick * 0.01 + cx) * 8;
+                        if (sx > -120 && sx < W + 120) {
+                            ctx.beginPath();
+                            ctx.arc(sx, 48, 18, 0, Math.PI * 2);
+                            ctx.arc(sx + 20, 42, 22, 0, Math.PI * 2);
+                            ctx.arc(sx + 42, 48, 17, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+
+                    // Parallax Rolling Green Hills & Studio Buildings
+                    for (let hx = -40; hx < WORLD_W; hx += 340) {
+                        const shx = hx - cameraX * 0.5;
+                        if (shx > -300 && shx < W + 200) {
+                            ctx.fillStyle = '#86efac';
+                            ctx.beginPath();
+                            ctx.arc(shx + 110, GROUND_Y + 25, 135, Math.PI, 0);
+                            ctx.fill();
+
+                            // Studio City Building Silhouette
+                            ctx.fillStyle = '#60a5fa';
+                            this.drawPillRect(ctx, shx + 190, 128, 72, 120, 8);
+                            ctx.fill();
+                            ctx.fillStyle = '#fef08a';
+                            for (let wy = 142; wy < 220; wy += 24) {
+                                ctx.fillRect(shx + 204, wy, 14, 14);
+                                ctx.fillRect(shx + 232, wy, 14, 14);
+                            }
+                        }
+                    }
+
+                    ctx.save();
+                    ctx.translate(-cameraX, 0);
+
+                    // Pit Hazard Warning Signs & Water/Lava at Bottom of Gaps
+                    [540, 1065, 1635].forEach((gapX, idx) => {
+                        const gapW = idx === 0 ? 95 : (idx === 1 ? 120 : 115);
+                        ctx.fillStyle = '#0284c7';
+                        ctx.fillRect(gapX, GROUND_Y + 14, gapW, H - GROUND_Y);
+                        ctx.fillStyle = '#7dd3fc';
+                        ctx.fillRect(gapX, GROUND_Y + 14, gapW, 4);
+                    });
+
+                    // Grass & Earth Ground Segments
+                    groundSegments.forEach(seg => {
+                        // Soil
+                        ctx.fillStyle = '#92400e';
+                        ctx.fillRect(seg.x, GROUND_Y + 8, seg.w, H - GROUND_Y);
+                        // Bright Green Grass Top
+                        ctx.fillStyle = '#22c55e';
+                        this.drawPillRect(ctx, seg.x, GROUND_Y, seg.w, 14, 5);
+                        ctx.fill();
+                        ctx.fillStyle = '#4ade80';
+                        ctx.fillRect(seg.x + 4, GROUND_Y + 2, seg.w - 8, 4);
+                    });
+
+                    // Zone Signposts
+                    const signs = [
+                        { x: 255, text: 'POS 1: TANYA MENTOR' },
+                        { x: 745, text: 'POS 2: LOMPATI BUG & JURANG' },
+                        { x: 1975, text: 'POS 3: SUNDUL JAWABAN ↑' }
+                    ];
+                    signs.forEach(s => {
+                        ctx.fillStyle = '#78350f';
+                        ctx.fillRect(s.x + 76, GROUND_Y - 62, 6, 62);
+                        ctx.fillStyle = '#fef3c7';
+                        this.drawPillRect(ctx, s.x, GROUND_Y - 84, 158, 24, 7);
+                        ctx.fill();
+                        ctx.strokeStyle = '#d97706';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                        ctx.fillStyle = '#78350f';
+                        ctx.font = 'bold 10px "Plus Jakarta Sans", sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(s.text, s.x + 79, GROUND_Y - 68);
+                    });
+
+                    // Checkpoint Flag
+                    ctx.fillStyle = '#475569';
+                    ctx.fillRect(checkpoint.x, checkpoint.y, 4, 56);
+                    ctx.fillStyle = checkpointReached ? '#10b981' : '#f59e0b';
+                    ctx.beginPath();
+                    ctx.moveTo(checkpoint.x + 4, checkpoint.y + 2);
+                    ctx.lineTo(checkpoint.x + 34, checkpoint.y + 12);
+                    ctx.lineTo(checkpoint.x + 4, checkpoint.y + 22);
+                    ctx.fill();
+
+                    // Elevated & Moving Platforms
+                    platforms.forEach(plat => {
+                        ctx.fillStyle = plat.moveRange > 0 ? '#f59e0b' : '#0284c7';
+                        this.drawPillRect(ctx, plat.x, plat.y, plat.w, plat.h, 7);
+                        ctx.fill();
+                        ctx.strokeStyle = '#ffffff';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    });
+
+                    // Coins
+                    coins.forEach(c => {
+                        if (c.collected) return;
+                        const bob = Math.sin(animTick * 0.1 + c.x) * 3;
+                        ctx.fillStyle = '#fbbf24';
+                        ctx.beginPath();
+                        ctx.arc(c.x, c.y + bob, 10, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.strokeStyle = '#ffffff';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                        ctx.fillStyle = '#78350f';
+                        ctx.font = 'bold 10px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('★', c.x, c.y + bob + 3.5);
+                    });
+
+                    // Patrolling Bug Enemies
+                    bugs.forEach(bug => {
+                        if (bug.y > H) return;
+                        const walkBob = Math.sin(animTick * 0.3) * 2;
+                        ctx.fillStyle = '#7e22ce';
+                        this.drawPillRect(ctx, bug.x, bug.y + walkBob, bug.w, bug.h, 8);
+                        ctx.fill();
+                        ctx.strokeStyle = '#f3e8ff';
+                        ctx.lineWidth = 1.5;
+                        ctx.stroke();
+                        // Bug angry eyes
+                        ctx.fillStyle = '#fef08a';
+                        ctx.fillRect(bug.x + 6, bug.y + 7 + walkBob, 4, 4);
+                        ctx.fillRect(bug.x + 18, bug.y + 7 + walkBob, 4, 4);
+                    });
+
+                    // NPC Mentor + Exclamation Bubble
+                    drawOutdoorCharacter(npc.x, npc.y, player.x < npc.x ? -1 : 1, false, true);
+                    const badgeBob = Math.sin(animTick * 0.12) * 3;
+                    ctx.fillStyle = npcTalked ? '#10b981' : '#f59e0b';
+                    this.drawPillRect(ctx, npc.x - 16, npc.y - 26 + badgeBob, 62, 18, 6);
+                    ctx.fill();
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 10px "Plus Jakarta Sans", sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(npcTalked ? '✓ Mentor' : '! Tanya', npc.x + 15, npc.y - 14 + badgeBob);
+
+                    // Answer Blocks
+                    answerBlocks.forEach(blk => {
+                        const by = blk.y + blk.bumpY;
+                        ctx.fillStyle = blk.hitWrong ? '#e11d48' : '#2563eb';
+                        this.drawPillRect(ctx, blk.x, by, blk.w, blk.h, 9);
+                        ctx.fill();
+                        ctx.strokeStyle = '#ffffff';
+                        ctx.lineWidth = 2.5;
+                        ctx.stroke();
+
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(blk.label, blk.x + blk.w / 2, by + 22);
+                    });
+
+                    // Player Character (blink when invulnerable after respawn)
+                    if (player.invuln === 0 || Math.floor(player.invuln / 4) % 2 === 0) {
+                        drawOutdoorCharacter(player.x, player.y, player.facing, Math.abs(player.vx) > 0.3, false);
+                    }
+
+                    // Particles
+                    for (let i = particles.length - 1; i >= 0; i--) {
+                        const p = particles[i];
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vy += 0.25;
+                        p.life--;
+                        ctx.fillStyle = p.color;
+                        ctx.fillRect(p.x, p.y, 4, 4);
+                        if (p.life <= 0) particles.splice(i, 1);
+                    }
+
+                    ctx.restore();
+
+                    if (!completed) {
+                        this.platformerAnimId = requestAnimationFrame(loop);
+                    }
+                };
+
+                this.platformerAnimId = requestAnimationFrame(loop);
+            }
+
+            // -----------------------------------------------------------------
+            // STAGE 2: MINI-GAME PERTANYAAN & SUSUN KATA JAWABAN (DRAG & DROP)
+            // -----------------------------------------------------------------
+            renderStage2(st, container) {
+                const target = st.word.toUpperCase();
+                const questionText = st.wordQuestion || st.question;
+                this.currentInstructionText = `Jawab pertanyaan berikut dengan menyusun hurufnya: ${questionText}`;
+                this.speech.speak(this.currentInstructionText);
+                document.getElementById('prompt-text-spoken').innerText = 'Jawab Pertanyaan & Susun Kata';
+
+                this.userSpellingSlot = new Array(target.length).fill(null);
+                const scrambled = target.split('').map((char, idx) => ({ char, id: idx }))
+                    .sort(() => 0.5 - Math.random());
+
+                container.innerHTML = `
+                    <div class="w-full flex flex-col items-center animate-pop-in">
+                        <!-- Realistic Studio Terminal Question Card -->
+                        <div class="w-full bg-slate-900 text-white rounded-2xl p-4 md:p-5 border border-slate-700 shadow-xl mb-5 relative overflow-hidden">
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-2.5 mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                    <span class="font-mono-code text-[11px] text-sky-400 font-bold ml-1 uppercase tracking-wider">
+                                        TERMINAL DEKRIPSI • ${st.name}
+                                    </span>
+                                </div>
+                                <span class="font-mono-code text-[11px] bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-md border border-slate-700">
+                                    ${target.length} HURUF
+                                </span>
+                            </div>
+                            <p class="text-sm md:text-base font-bold text-slate-100 leading-relaxed text-center">
+                                "${questionText}"
+                            </p>
+                        </div>
+
+                        <p class="font-mono-code text-[11px] font-semibold text-slate-500 mb-3 text-center">
+                            Seret (Drag & Drop) atau ketuk modul huruf ke slot jawaban di bawah
+                        </p>
+
+                        <!-- Target Drop Slots (Circuit / Keycap Bay) -->
+                        <div id="spelling-slots" class="flex flex-wrap justify-center gap-2 md:gap-2.5 mb-4 bg-slate-950 p-4 rounded-2xl border-2 border-slate-800 shadow-inner w-full max-w-xl">
+                            ${target.split('').map((_, idx) => `
+                                <div id="slot-${idx}" data-slot-idx="${idx}"
+                                    onclick="game.clearSlot(${idx})"
+                                    class="drop-slot font-mono-code w-11 h-13 md:w-13 md:h-15 py-2.5 rounded-xl border-2 border-dashed border-sky-500/60 bg-slate-900/90 flex items-center justify-center text-xl md:text-2xl font-extrabold text-sky-300 cursor-pointer transition shadow-inner">
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div id="spelling-feedback" class="h-6 mb-3 text-xs md:text-sm font-extrabold text-center"></div>
+
+                        <!-- Draggable Mechanical Keycap Tiles -->
+                        <div id="letter-bank" class="flex flex-wrap justify-center gap-2.5 md:gap-3 bg-slate-100 p-3.5 rounded-2xl border border-slate-200 shadow-sm">
+                            ${scrambled.map((item) => `
+                                <button id="tile-${item.id}" draggable="true" data-tile-id="${item.id}" data-char="${item.char}"
+                                    onclick="game.tapTile(${item.id})"
+                                    class="letter-tile btn-chunky font-mono-code w-11 h-13 md:w-13 md:h-15 py-2.5 rounded-xl bg-gradient-to-b from-slate-700 to-slate-900 text-white font-extrabold text-xl md:text-2xl border border-slate-500 flex items-center justify-center cursor-grab active:cursor-grabbing shadow-md">
+                                    ${item.char}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+
+                this.bindDragAndDropEvents();
+            }
+
+            bindDragAndDropEvents() {
+                let draggedTileId = null;
+
+                document.querySelectorAll('.letter-tile').forEach(tile => {
+                    tile.addEventListener('dragstart', (e) => {
+                        draggedTileId = parseInt(tile.getAttribute('data-tile-id'), 10);
+                        if (e.dataTransfer) {
+                            e.dataTransfer.setData('text/plain', String(draggedTileId));
+                        }
+                    });
+
+                    tile.addEventListener('touchstart', () => {
+                        draggedTileId = parseInt(tile.getAttribute('data-tile-id'), 10);
+                    }, { passive: true });
+
+                    tile.addEventListener('touchend', (e) => {
+                        if (draggedTileId === null) return;
+                        const touch = e.changedTouches[0];
+                        if (touch) {
+                            const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+                            const slotEl = targetEl ? targetEl.closest('.drop-slot') : null;
+                            if (slotEl) {
+                                const sIdx = parseInt(slotEl.getAttribute('data-slot-idx'), 10);
+                                this.placeTileInSlot(draggedTileId, sIdx);
+                            }
+                        }
+                        draggedTileId = null;
+                    });
+                });
+
+                document.querySelectorAll('.drop-slot').forEach(slot => {
+                    slot.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        slot.classList.add('bg-sky-200', 'scale-105');
+                    });
+                    slot.addEventListener('dragleave', () => {
+                        slot.classList.remove('bg-sky-200', 'scale-105');
+                    });
+                    slot.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        slot.classList.remove('bg-sky-200', 'scale-105');
+                        const sIdx = parseInt(slot.getAttribute('data-slot-idx'), 10);
+                        const tid = e.dataTransfer ? parseInt(e.dataTransfer.getData('text/plain'), 10) : draggedTileId;
+                        if (!isNaN(tid)) {
+                            this.placeTileInSlot(tid, sIdx);
+                        }
+                    });
+                });
+            }
+
+            tapTile(tileId) {
+                const emptyIdx = this.userSpellingSlot.findIndex(s => s === null);
+                if (emptyIdx !== -1) {
+                    this.placeTileInSlot(tileId, emptyIdx);
+                }
+            }
+
+            placeTileInSlot(tileId, slotIdx) {
+                const tileEl = document.getElementById(`tile-${tileId}`);
+                if (!tileEl || tileEl.disabled) return;
+
+                if (this.userSpellingSlot[slotIdx] !== null) {
+                    this.clearSlot(slotIdx);
+                }
+
+                const char = tileEl.getAttribute('data-char');
+                this.userSpellingSlot[slotIdx] = { tileId, char };
+
+                tileEl.disabled = true;
+                tileEl.classList.add('opacity-25', 'pointer-events-none');
+
+                const slotEl = document.getElementById(`slot-${slotIdx}`);
+                if (slotEl) {
+                    slotEl.innerText = char;
+                    slotEl.classList.remove('border-dashed', 'bg-slate-900/90', 'border-sky-500/60', 'text-sky-300');
+                    slotEl.classList.add('border-solid', 'bg-gradient-to-b', 'from-sky-500', 'to-blue-600', 'border-sky-300', 'text-white', 'shadow-lg');
+                }
+
+                this.sound.playPop();
+                this.checkSpellingCompletion();
+            }
+
+            clearSlot(slotIdx) {
+                const entry = this.userSpellingSlot[slotIdx];
+                if (!entry) return;
+
+                const tileEl = document.getElementById(`tile-${entry.tileId}`);
+                if (tileEl) {
+                    tileEl.disabled = false;
+                    tileEl.classList.remove('opacity-25', 'pointer-events-none');
+                }
+
+                this.userSpellingSlot[slotIdx] = null;
+                const slotEl = document.getElementById(`slot-${slotIdx}`);
+                if (slotEl) {
+                    slotEl.innerText = '';
+                    slotEl.classList.add('border-dashed', 'bg-slate-900/90', 'border-sky-500/60', 'text-sky-300');
+                    slotEl.classList.remove('border-solid', 'bg-gradient-to-b', 'from-sky-500', 'to-blue-600', 'border-sky-300', 'text-white', 'shadow-lg');
+                }
+                this.sound.playPop();
+            }
+
+            checkSpellingCompletion() {
+                if (this.userSpellingSlot.some(s => s === null)) return;
+
+                const st = this.stations[this.currentStationIndex];
+                const target = st.word.toUpperCase();
+                const userAttempt = this.userSpellingSlot.map(s => s.char).join('');
+                const fb = document.getElementById('spelling-feedback');
+
+                if (userAttempt === target) {
+                    this.sound.playSuccess();
+                    this.speech.speak(`Luar biasa! Kata ${target} tersusun tepat!`);
+                    if (fb) {
+                        fb.innerText = `🎉 Hebat! Kata "${target}" benar!`;
+                        fb.className = 'h-6 mb-3 text-sm font-extrabold text-center text-emerald-600';
+                    }
+                    setTimeout(() => this.advanceStage(), 1100);
+                } else {
+                    this.sound.playWrong();
+                    this.speech.speak('Susunan huruf belum tepat, coba lagi!');
+                    if (fb) {
+                        fb.innerText = '❌ Belum tepat! Ketuk kotak untuk mengulang.';
+                        fb.className = 'h-6 mb-3 text-sm font-extrabold text-center text-rose-500 animate-wiggle';
+                    }
+                }
+            }
+
+            // -----------------------------------------------------------------
+            // STAGE 3: MINI-GAME QUALITY ASSURANCE AUDIT (TRUE / FALSE)
+            // -----------------------------------------------------------------
+            renderStage3(st, container) {
+                this.currentInstructionText = `Audit Kualitas: Benar atau Salah? ${st.tfStatement}`;
+                this.speech.speak(this.currentInstructionText);
+                document.getElementById('prompt-text-spoken').innerText = 'Quality Assurance Audit: Valid atau Invalid?';
+
+                container.innerHTML = `
+                    <div class="w-full flex flex-col items-center animate-pop-in">
+                        <div class="bg-slate-900 text-white border border-slate-700 rounded-2xl p-5 md:p-7 w-full shadow-2xl mb-5 relative overflow-hidden">
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-9 h-9 rounded-xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-xl">
+                                        ${st.emoji}
+                                    </div>
+                                    <div class="text-left">
+                                        <span class="font-mono-code text-[10px] font-bold text-sky-400 uppercase tracking-widest block">
+                                            QA VERIFICATION TICKET #${st.letter}
+                                        </span>
+                                        <span class="font-extrabold text-sm text-white">${st.name}</span>
+                                    </div>
+                                </div>
+                                <span class="font-mono-code text-[11px] bg-amber-500/20 text-amber-300 border border-amber-400/40 px-3 py-1 rounded-lg font-bold">
+                                    REVIEW DOKUMEN
+                                </span>
+                            </div>
+
+                            <p class="text-base md:text-lg font-bold text-slate-100 leading-relaxed text-center py-2">
+                                "${st.tfStatement}"
+                            </p>
+                        </div>
+
+                        <div id="tf-feedback" class="h-7 mb-3 text-xs md:text-sm font-extrabold text-center"></div>
+
+                        <div class="grid grid-cols-2 gap-4 w-full max-w-md">
+                            <button onclick="game.checkTrueFalse(true)" class="btn-chunky bg-gradient-to-b from-emerald-500 to-emerald-700 text-white font-extrabold py-4 px-5 rounded-2xl border border-emerald-400/60 flex items-center justify-center gap-3">
+                                <span class="text-2xl">✅</span>
+                                <div class="text-left leading-tight">
+                                    <span class="block text-base md:text-lg">BENAR</span>
+                                    <span class="font-mono-code text-[10px] text-emerald-100 font-semibold">APPROVE</span>
+                                </div>
+                            </button>
+                            <button onclick="game.checkTrueFalse(false)" class="btn-chunky bg-gradient-to-b from-rose-500 to-rose-700 text-white font-extrabold py-4 px-5 rounded-2xl border border-rose-400/60 flex items-center justify-center gap-3">
+                                <span class="text-2xl">❌</span>
+                                <div class="text-left leading-tight">
+                                    <span class="block text-base md:text-lg">SALAH</span>
+                                    <span class="font-mono-code text-[10px] text-rose-100 font-semibold">REJECT</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            checkTrueFalse(choice) {
+                const st = this.stations[this.currentStationIndex];
+                const fb = document.getElementById('tf-feedback');
+                if (choice === st.tfAnswer) {
+                    this.sound.playSuccess();
+                    this.speech.speak('Tepat sekali! Jawabanmu benar!');
+                    if (fb) {
+                        fb.innerText = '🎉 Tepat sekali! Lanjut ke mini-game berikutnya...';
+                        fb.className = 'h-7 mb-3 text-sm font-extrabold text-center text-emerald-600 animate-bounce';
+                    }
+                    setTimeout(() => this.advanceStage(), 1200);
+                } else {
+                    this.sound.playWrong();
+                    this.speech.speak('Kurang tepat, coba baca kembali pernyataannya!');
+                    if (fb) {
+                        fb.innerText = '🤔 Kurang tepat! Coba perhatikan kembali pernyataannya.';
+                        fb.className = 'h-7 mb-3 text-sm font-extrabold text-center text-rose-500 animate-wiggle';
+                    }
+                }
+            }
+
+            // -----------------------------------------------------------------
+            // STAGE 4: MINI-GAME DATA PIPELINE COLLECTOR (ARCADE CATCHER)
+            // -----------------------------------------------------------------
+            renderStage4(st, container) {
+                this.currentInstructionText = `Kumpulkan 5 paket data yang berkaitan dengan ${st.name} dan hindari bug sistem!`;
+                this.speech.speak(this.currentInstructionText);
+                document.getElementById('prompt-text-spoken').innerText = `Data Pipeline Collector • ${st.name}`;
+
+                container.innerHTML = `
+                    <div class="w-full flex flex-col items-center animate-pop-in">
+                        <div class="w-full flex flex-wrap justify-between items-center bg-slate-900 text-white border border-slate-700 rounded-2xl px-4 py-2.5 mb-2.5 text-xs md:text-sm font-bold shadow-md gap-2">
+                            <div class="flex items-center gap-1.5 text-emerald-400">
+                                <span class="font-mono-code text-[11px] bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/40">VALID</span>
+                                <span class="font-bold text-slate-100">${st.catchTargets.join(' • ')}</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 text-rose-400">
+                                <span class="font-mono-code text-[11px] bg-rose-500/20 px-2 py-0.5 rounded border border-rose-500/40">CORRUPT</span>
+                                <span class="font-bold text-slate-100">${st.catchAvoid.join(' • ')}</span>
+                            </div>
+                        </div>
+
+                        <div class="relative w-full rounded-2xl overflow-hidden border-2 border-slate-700 shadow-2xl bg-slate-950">
+                            <canvas id="catcher-canvas" class="w-full h-[265px] md:h-[295px] block cursor-ew-resize"></canvas>
+                            <div id="catcher-score-badge" class="font-mono-code absolute top-3 right-3 bg-slate-900/90 text-sky-300 font-extrabold px-3.5 py-1.5 rounded-xl text-xs md:text-sm border border-sky-400/50 shadow-lg backdrop-blur">
+                                PACKETS: 0 / 5
+                            </div>
+                        </div>
+                        <p class="font-mono-code text-[11px] font-medium text-slate-500 mt-2">
+                            Geser kursor atau sentuh layar untuk menggerakkan Server Collector Drone
+                        </p>
+                    </div>
+                `;
+
+                this.initCatcherEngine(st);
+            }
+
+            initCatcherEngine(st) {
+                const canvas = document.getElementById('catcher-canvas');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                const W = 640;
+                const H = 295;
+                canvas.width = W;
+                canvas.height = H;
+
+                let score = 0;
+                let done = false;
+                let tick = 0;
+                const basket = { x: W / 2 - 56, y: H - 44, w: 112, h: 28 };
+                const fallingItems = [];
+
+                const moveBasket = (clientX) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const relX = ((clientX - rect.left) / rect.width) * W;
+                    basket.x = Math.max(8, Math.min(W - basket.w - 8, relX - basket.w / 2));
+                };
+
+                canvas.addEventListener('mousemove', (e) => moveBasket(e.clientX));
+                canvas.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    if (e.touches && e.touches[0]) {
+                        moveBasket(e.touches[0].clientX);
+                    }
+                }, { passive: false });
+                canvas.addEventListener('touchstart', (e) => {
+                    if (e.touches && e.touches[0]) {
+                        moveBasket(e.touches[0].clientX);
+                    }
+                }, { passive: true });
+
+                const spawnItem = () => {
+                    if (done) return;
+                    const isGood = Math.random() < 0.68;
+                    const pool = isGood ? st.catchTargets : st.catchAvoid;
+                    const label = pool[Math.floor(Math.random() * pool.length)];
+                    fallingItems.push({
+                        x: Math.random() * (W - 120) + 60,
+                        y: -25,
+                        vy: 2.3 + Math.random() * 1.4,
+                        label,
+                        isGood
+                    });
+                };
+
+                spawnItem();
+                this.catcherSpawnTimer = setInterval(spawnItem, 950);
+
+                const scoreBadge = document.getElementById('catcher-score-badge');
+
+                const loop = () => {
+                    tick++;
+                    // Realistic Server Room Data Rack Background
+                    const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+                    bgGrad.addColorStop(0, '#020617');
+                    bgGrad.addColorStop(1, '#0f172a');
+                    ctx.fillStyle = bgGrad;
+                    ctx.fillRect(0, 0, W, H);
+
+                    // Vertical Server Rack Columns & Blinking Status LEDs
+                    for (let sx = 24; sx < W; sx += 156) {
+                        ctx.fillStyle = 'rgba(30, 41, 59, 0.45)';
+                        ctx.fillRect(sx, 10, 124, H - 20);
+                        ctx.strokeStyle = 'rgba(51, 65, 85, 0.5)';
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(sx, 10, 124, H - 20);
+
+                        for (let ry = 24; ry < H - 30; ry += 28) {
+                            ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
+                            ctx.fillRect(sx + 8, ry, 108, 16);
+                            ctx.fillStyle = (tick + sx + ry) % 45 < 22 ? 'rgba(56, 189, 248, 0.45)' : 'rgba(16, 185, 129, 0.45)';
+                            ctx.fillRect(sx + 14, ry + 6, 4, 4);
+                        }
+                    }
+
+                    // Floor Rail Track
+                    ctx.fillStyle = '#1e293b';
+                    ctx.fillRect(0, H - 14, W, 14);
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.fillRect(0, H - 14, W, 2);
+
+                    for (let i = fallingItems.length - 1; i >= 0; i--) {
+                        const it = fallingItems[i];
+                        it.y += it.vy;
+
+                        // Drop Shadow
+                        ctx.fillStyle = 'rgba(2, 6, 23, 0.6)';
+                        this.drawPillRect(ctx, it.x - 52, it.y - 12, 104, 30, 8);
+                        ctx.fill();
+
+                        // Realistic Data Module Capsule
+                        ctx.fillStyle = it.isGood ? '#065f46' : '#881337';
+                        this.drawPillRect(ctx, it.x - 52, it.y - 15, 104, 30, 8);
+                        ctx.fill();
+                        ctx.strokeStyle = it.isGood ? '#34d399' : '#fb7185';
+                        ctx.lineWidth = 1.8;
+                        ctx.stroke();
+
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(it.label, it.x, it.y);
+
+                        if (
+                            it.y + 14 >= basket.y &&
+                            it.y - 14 <= basket.y + basket.h &&
+                            it.x + 38 >= basket.x &&
+                            it.x - 38 <= basket.x + basket.w
+                        ) {
+                            fallingItems.splice(i, 1);
+                            if (it.isGood) {
+                                score++;
+                                this.sound.playCoin();
+                                if (scoreBadge) scoreBadge.innerText = `PACKETS: ${score} / 5`;
+                                if (score >= 5 && !done) {
+                                    done = true;
+                                    this.stopCatcherGame();
+                                    this.sound.playSuccess();
+                                    this.speech.speak('Hebat! Semua paket data berhasil terkumpul!');
+                                    setTimeout(() => this.advanceStage(), 1000);
+                                    return;
+                                }
+                            } else {
+                                score = Math.max(0, score - 1);
+                                this.sound.playWrong();
+                                if (scoreBadge) scoreBadge.innerText = `PACKETS: ${score} / 5`;
+                            }
+                            continue;
+                        }
+
+                        if (it.y > H + 30) {
+                            fallingItems.splice(i, 1);
+                        }
+                    }
+
+                    // Realistic Magnetic Server Drone Collector
+                    const beamGrad = ctx.createLinearGradient(0, basket.y - 18, 0, basket.y);
+                    beamGrad.addColorStop(0, 'rgba(56, 189, 248, 0)');
+                    beamGrad.addColorStop(1, 'rgba(56, 189, 248, 0.25)');
+                    ctx.fillStyle = beamGrad;
+                    ctx.fillRect(basket.x + 6, basket.y - 18, basket.w - 12, 18);
+
+                    ctx.fillStyle = '#1e293b';
+                    this.drawPillRect(ctx, basket.x, basket.y, basket.w, basket.h, 8);
+                    ctx.fill();
+                    ctx.strokeStyle = '#38bdf8';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Thruster / Rail Wheels
+                    ctx.fillStyle = '#0ea5e9';
+                    ctx.fillRect(basket.x + 12, basket.y + basket.h - 3, 20, 4);
+                    ctx.fillRect(basket.x + basket.w - 32, basket.y + basket.h - 3, 20, 4);
+
+                    ctx.fillStyle = '#f8fafc';
+                    ctx.font = 'bold 11px "JetBrains Mono", monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('DATA COLLECTOR', basket.x + basket.w / 2, basket.y + basket.h / 2 + 1);
+
+                    if (!done) {
+                        this.catcherAnimId = requestAnimationFrame(loop);
+                    }
+                };
+
+                this.catcherAnimId = requestAnimationFrame(loop);
+            }
+
+            // -----------------------------------------------------------------
+            // STAGE 5: MINI-GAME SYSTEM ARCHITECTURE MAPPING (PAIR MATCHING)
+            // -----------------------------------------------------------------
+            renderStage5(st, container) {
+                this.currentInstructionText = `Hubungkan modul istilah ${st.name} di sebelah kiri dengan spesifikasi fungsinya di sebelah kanan!`;
+                this.speech.speak(this.currentInstructionText);
+                document.getElementById('prompt-text-spoken').innerText = `System Architecture Mapping • ${st.name}`;
+
+                this.selectedLeftIdx = null;
+                this.matchedPairCount = 0;
+
+                const leftItems = st.pairs.map((p, idx) => ({ text: p.left, pairId: idx }));
+                const rightItems = st.pairs.map((p, idx) => ({ text: p.right, pairId: idx }))
+                    .sort(() => 0.5 - Math.random());
+
+                container.innerHTML = `
+                    <div class="w-full flex flex-col items-center animate-pop-in">
+                        <div class="bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 mb-4 text-xs md:text-sm font-semibold text-slate-700 text-center">
+                            Pilih node <span class="text-sky-700 font-extrabold">Komponen (Kiri)</span> lalu hubungkan ke <span class="text-indigo-700 font-extrabold">Spesifikasi Fungsi (Kanan)</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 md:gap-6 w-full">
+                            <div class="flex flex-col gap-3">
+                                <span class="font-mono-code text-[10px] font-bold text-slate-400 uppercase tracking-widest text-left px-1">01 // KOMPONEN</span>
+                                ${leftItems.map((item, i) => `
+                                    <button id="pair-left-${i}" data-pair-id="${item.pairId}" onclick="game.selectLeftPair(${i})"
+                                        class="pair-left-btn btn-chunky w-full min-h-[68px] bg-slate-900 hover:bg-slate-800 border border-sky-500/50 text-white font-extrabold text-sm md:text-base p-3.5 rounded-2xl transition flex items-center justify-between text-left">
+                                        <span>${item.text}</span>
+                                        <span class="w-3 h-3 rounded-full bg-sky-400 shrink-0 ml-2"></span>
+                                    </button>
+                                `).join('')}
+                            </div>
+
+                            <div class="flex flex-col gap-3">
+                                <span class="font-mono-code text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right px-1">02 // SPESIFIKASI</span>
+                                ${rightItems.map((item, i) => `
+                                    <button id="pair-right-${i}" data-pair-id="${item.pairId}" onclick="game.selectRightPair(${i})"
+                                        class="pair-right-btn btn-chunky w-full min-h-[68px] bg-white hover:bg-slate-50 border-2 border-slate-300 text-slate-800 font-bold text-xs md:text-sm p-3.5 rounded-2xl transition flex items-center gap-2.5 text-left">
+                                        <span class="w-3 h-3 rounded-full bg-indigo-500 shrink-0"></span>
+                                        <span>${item.text}</span>
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            selectLeftPair(idx) {
+                const btn = document.getElementById(`pair-left-${idx}`);
+                if (!btn || btn.disabled) return;
+                this.sound.playPop();
+
+                document.querySelectorAll('.pair-left-btn').forEach(b => {
+                    if (!b.disabled) b.classList.remove('ring-4', 'ring-sky-400', 'scale-[1.02]');
+                });
+
+                this.selectedLeftIdx = idx;
+                btn.classList.add('ring-4', 'ring-sky-400', 'scale-[1.02]');
+            }
+
+            selectRightPair(rightIdx) {
+                const rightBtn = document.getElementById(`pair-right-${rightIdx}`);
+                if (!rightBtn || rightBtn.disabled || this.selectedLeftIdx === null) return;
+
+                const leftBtn = document.getElementById(`pair-left-${this.selectedLeftIdx}`);
+                const leftPairId = leftBtn.getAttribute('data-pair-id');
+                const rightPairId = rightBtn.getAttribute('data-pair-id');
+
+                if (leftPairId === rightPairId) {
+                    this.sound.playSuccess();
+                    leftBtn.disabled = true;
+                    rightBtn.disabled = true;
+
+                    leftBtn.className = 'w-full min-h-[68px] bg-gradient-to-r from-emerald-600 to-teal-700 border border-emerald-300 text-white font-extrabold text-sm md:text-base p-3.5 rounded-2xl shadow-md flex items-center justify-between text-left';
+                    rightBtn.className = 'w-full min-h-[68px] bg-gradient-to-r from-emerald-600 to-teal-700 border border-emerald-300 text-white font-bold text-xs md:text-sm p-3.5 rounded-2xl shadow-md flex items-center gap-2.5 text-left';
+
+                    this.selectedLeftIdx = null;
+                    this.matchedPairCount++;
+
+                    if (this.matchedPairCount >= 3) {
+                        this.speech.speak('Sempurna! Semua modul arsitektur berhasil dihubungkan!');
+                        setTimeout(() => this.advanceStage(), 1000);
+                    }
+                } else {
+                    this.sound.playWrong();
+                    rightBtn.classList.add('animate-wiggle', 'bg-rose-100', 'border-rose-400');
+                    setTimeout(() => rightBtn.classList.remove('animate-wiggle', 'bg-rose-100', 'border-rose-400'), 600);
+                }
+            }
+
+            // -----------------------------------------------------------------
+            // CELEBRATION & MODALS
+            // -----------------------------------------------------------------
+            showWinModal() {
+                this.sound.playSuccess();
+                const st = this.stations[this.currentStationIndex];
+                this.speech.speak(`Selamat! Kamu telah menguasai seluruh 5 tahap materi ${st.name}!`);
+                this.launchConfetti();
+
+                document.getElementById('win-title').innerText = `Selesai: ${st.name}!`;
+                document.getElementById('win-subtitle').innerText = `5/5 Mini-Game untuk "${st.enName}" telah ditaklukkan!`;
+                document.getElementById('modal-win').classList.remove('hidden');
+            }
+
+            nextStation() {
+                this.sound.playPop();
+                document.getElementById('modal-win').classList.add('hidden');
+                if (this.currentStationIndex + 1 < this.stations.length) {
+                    this.startStation(this.currentStationIndex + 1);
+                } else {
+                    this.showMap();
+                }
+            }
+
+            launchConfetti() {
+                const container = document.getElementById('confetti-container');
+                if (!container) return;
+                container.innerHTML = '';
+                const colors = ['#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#8b5cf6'];
+                for (let i = 0; i < 50; i++) {
+                    const el = document.createElement('div');
+                    el.className = 'confetti-piece rounded-sm';
+                    el.style.left = Math.random() * 100 + 'vw';
+                    el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    el.style.animationDelay = (Math.random() * 0.6) + 's';
+                    container.appendChild(el);
+                }
+            }
+        }
+
+        window.game = new DevGameApp();
+    </script>
+</body>
+</html>
